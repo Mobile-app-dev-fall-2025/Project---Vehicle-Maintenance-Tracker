@@ -14,6 +14,7 @@ class MyApp extends StatelessWidget {
       title: 'Vehicle Maintenance Tracker',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: const VehicleListPage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
