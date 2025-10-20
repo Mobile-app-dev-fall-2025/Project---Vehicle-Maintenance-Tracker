@@ -25,8 +25,8 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
         'make': makeController.text,
         'model': modelController.text,
         'year': int.tryParse(yearController.text) ?? 0,
-        'license_plate': licenseController.text,
-        'mileage': int.tryParse(mileageController.text) ?? 0, // ✅ NEW FIELD
+        'licensePlate': licenseController.text, // ✅ matches DB
+        'mileage': int.tryParse(mileageController.text) ?? 0,
       });
 
       // Return to home screen and refresh vehicle list

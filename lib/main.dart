@@ -1,4 +1,5 @@
 import 'package:act10/add_vehicle_page.dart';
+import 'package:act10/vehicle_detail_page.dart';
 import 'package:flutter/material.dart';
 import './database/db_helper.dart';
 
@@ -106,6 +107,15 @@ class _VehicleListPageState extends State<VehicleListPage> {
                             subtitle: Text(
                               'Year: ${v['year']} • Plate: ${v['license_plate']}',
                             ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      VehicleDetailPage(vehicle: v),
+                                ),
+                              );
+                            },
                             trailing: IconButton(
                               icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () async {
