@@ -7,9 +7,7 @@ class DBHelper {
   DBHelper._internal();
 
   static Database? _db;
-
-  // Database name and version
-  static const _dbName = 'vehicle_app.db';
+  static const _dbName = 'vehicle_maintenance.db';
   static const _dbVersion = 1;
 
   Future<Database> get database async {
@@ -18,20 +16,13 @@ class DBHelper {
     return _db!;
   }
 
-  // Initialize DB
   Future<Database> _initDB() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, _dbName);
 
-    return await openDatabase(
-      path,
-      version: _dbVersion,
-      onCreate: _onCreate,
-      onUpgrade: _onUpgrade,
-    );
+    return await openDatabase(path, version: _dbVersion, onCreate: _onCreate);
   }
 
-  // Create all tables here
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE vehicles (
@@ -67,29 +58,18 @@ class DBHelper {
     ''');
   }
 
-  // Optional: handle DB version upgrades
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < newVersion) {
-      // Example: add a new column or create new tables
-      await db.execute('ALTER TABLE users ADD COLUMN age INTEGER');
-    }
-  }
-
   // ===== CRUD HELPERS =====
 
-  // Insert record
   Future<int> insert(String table, Map<String, dynamic> values) async {
     final db = await database;
     return await db.insert(table, values);
   }
 
-  // Query all
   Future<List<Map<String, dynamic>>> queryAll(String table) async {
     final db = await database;
     return await db.query(table);
   }
 
-  // Query with condition
   Future<List<Map<String, dynamic>>> queryWhere(
     String table,
     String where,
@@ -99,7 +79,6 @@ class DBHelper {
     return await db.query(table, where: where, whereArgs: whereArgs);
   }
 
-  // Update
   Future<int> update(
     String table,
     Map<String, dynamic> values,
@@ -110,7 +89,6 @@ class DBHelper {
     return await db.update(table, values, where: where, whereArgs: whereArgs);
   }
 
-  // Delete
   Future<int> delete(
     String table,
     String where,
@@ -120,9 +98,60 @@ class DBHelper {
     return await db.delete(table, where: where, whereArgs: whereArgs);
   }
 
-  // Close DB
   Future close() async {
     final db = await database;
     db.close();
+  }
+
+  // ===== EXTRA UTILITIES =====
+
+  // Get last maintenance date for a specific vehicle/type
+  Future<Map<String, dynamic>?> getLastMaintenance(
+    int vehicleId,
+    int typeId,
+  ) async {
+    final db = await database;
+    final result = await db.query(
+      'maintenance_logs',
+      where: 'vehicle_id = ? AND maintenance_type_id = ?',
+      whereArgs: [vehicleId, typeId],
+      orderBy: 'date_performed DESC',
+      limit: 1,
+    );
+    return result.isNotEmpty ? result.first : null;
+  }
+
+  // Preload some common maintenance types
+  Future<void> seedMaintenanceTypes() async {
+    final db = await database;
+    final count = Sqflite.firstIntValue(
+      await db.rawQuery('SELECT COUNT(*) FROM maintenance_types'),
+    );
+    if (count == 0) {
+      final maintenanceList = [
+        {
+          'name': 'Oil Change',
+          'description': 'Replace engine oil and oil filter',
+          'recommended_interval_days': 90,
+          'recommended_interval_miles': 3000,
+        },
+        {
+          'name': 'Tire Rotation',
+          'description': 'Rotate tires for even wear',
+          'recommended_interval_days': 180,
+          'recommended_interval_miles': 6000,
+        },
+        {
+          'name': 'Brake Inspection',
+          'description': 'Check brake pads and fluid levels',
+          'recommended_interval_days': 180,
+          'recommended_interval_miles': 7000,
+        },
+      ];
+
+      for (var item in maintenanceList) {
+        await db.insert('maintenance_types', item);
+      }
+    }
   }
 }
