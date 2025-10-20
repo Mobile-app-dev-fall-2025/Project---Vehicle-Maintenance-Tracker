@@ -9,7 +9,7 @@ class DBHelper {
   static Database? _db;
 
   // Database name and version
-  static const _dbName = 'my_app.db';
+  static const _dbName = 'vehicle_app.db';
   static const _dbVersion = 1;
 
   Future<Database> get database async {
@@ -34,29 +34,30 @@ class DBHelper {
   // Create all tables here
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE users (
+      CREATE TABLE car (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        email TEXT
+        make TEXT,
+        model TEXT,
+        year INTEGER,
+        license_num TEXT
       )
     ''');
 
     await db.execute('''
-      CREATE TABLE products (
+      CREATE TABLE users(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
-        price REAL
+        email, TEXT
       )
     ''');
 
     await db.execute('''
-      CREATE TABLE orders (
+      CREATE TABLE maintenance_logs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER,
-        product_id INTEGER,
-        quantity INTEGER,
+        vehicle_id INTEGER,
         FOREIGN KEY (user_id) REFERENCES users(id),
-        FOREIGN KEY (product_id) REFERENCES products(id)
+        FOREIGN KEY (vehicle_id) REFERENCES car(id)
       )
     ''');
   }
