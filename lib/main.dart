@@ -1,3 +1,4 @@
+import 'package:act10/add_vehicle_page.dart';
 import 'package:flutter/material.dart';
 import './database/db_helper.dart';
 
@@ -43,17 +44,6 @@ class _VehicleListPageState extends State<VehicleListPage> {
     });
   }
 
-  Future<void> _addDummyVehicle() async {
-    // Add a test vehicle (for demo)
-    await dbHelper.insert('vehicles', {
-      'make': 'Toyota',
-      'model': 'Camry',
-      'year': 2019,
-      'license_plate': 'ABC-1234',
-    });
-    _loadVehicles(); // refresh list
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,8 +55,17 @@ class _VehicleListPageState extends State<VehicleListPage> {
           children: [
             // Add New Vehicle button
             ElevatedButton.icon(
-              onPressed:
-                  _addDummyVehicle, // (you can later replace this with a form)
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddVehiclePage(),
+                  ),
+                );
+                if (result == true) {
+                  _loadVehicles(); // refresh list after returning
+                }
+              },
               icon: const Icon(Icons.add),
               label: const Text('Add New Vehicle'),
               style: ElevatedButton.styleFrom(
