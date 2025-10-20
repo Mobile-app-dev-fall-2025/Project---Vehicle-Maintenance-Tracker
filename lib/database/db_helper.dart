@@ -25,14 +25,15 @@ class DBHelper {
 
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE vehicles (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        make TEXT,
-        model TEXT,
-        year INTEGER,
-        license_plate TEXT
-      )
-    ''');
+  CREATE TABLE vehicles(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    make TEXT,
+    model TEXT,
+    year INTEGER,
+    licensePlate TEXT,
+    mileage INTEGER
+  )
+''');
 
     await db.execute('''
       CREATE TABLE maintenance_types (

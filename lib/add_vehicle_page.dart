@@ -17,6 +17,7 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
   final modelController = TextEditingController();
   final yearController = TextEditingController();
   final licenseController = TextEditingController();
+  final mileageController = TextEditingController(); // ✅ NEW CONTROLLER
 
   Future<void> _saveVehicle() async {
     if (_formKey.currentState!.validate()) {
@@ -25,11 +26,22 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
         'model': modelController.text,
         'year': int.tryParse(yearController.text) ?? 0,
         'license_plate': licenseController.text,
+        'mileage': int.tryParse(mileageController.text) ?? 0, // ✅ NEW FIELD
       });
 
       // Return to home screen and refresh vehicle list
       if (mounted) Navigator.pop(context, true);
     }
+  }
+
+  @override
+  void dispose() {
+    makeController.dispose();
+    modelController.dispose();
+    yearController.dispose();
+    licenseController.dispose();
+    mileageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -98,6 +110,17 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
                 validator: (value) => value == null || value.isEmpty
                     ? 'Enter the license plate'
                     : null,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: mileageController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Current Mileage',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Enter the mileage' : null,
               ),
               const SizedBox(height: 24),
               ElevatedButton.icon(
