@@ -34,30 +34,35 @@ class DBHelper {
   // Create all tables here
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE car (
+      CREATE TABLE vehicles (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         make TEXT,
         model TEXT,
         year INTEGER,
-        license_num TEXT
+        license_plate TEXT
       )
     ''');
 
     await db.execute('''
-      CREATE TABLE users(
+      CREATE TABLE maintenance_types (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
-        email, TEXT
+        description TEXT,
+        recommended_interval_days INTEGER,
+        recommended_interval_miles INTEGER
       )
     ''');
 
     await db.execute('''
       CREATE TABLE maintenance_logs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
         vehicle_id INTEGER,
-        FOREIGN KEY (user_id) REFERENCES users(id),
-        FOREIGN KEY (vehicle_id) REFERENCES car(id)
+        maintenance_type_id INTEGER,
+        date_performed TEXT,
+        mileage INTEGER,
+        notes TEXT,
+        FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE,
+        FOREIGN KEY (maintenance_type_id) REFERENCES maintenance_types(id)
       )
     ''');
   }
