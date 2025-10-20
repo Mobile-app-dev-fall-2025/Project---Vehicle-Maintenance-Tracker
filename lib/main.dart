@@ -56,53 +56,72 @@ class _VehicleListPageState extends State<VehicleListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Vehicles'),
-        actions: [
-          IconButton(icon: const Icon(Icons.add), onPressed: _addDummyVehicle),
-        ],
-      ),
+      appBar: AppBar(title: const Text('Vehicle Maintenance Tracker')),
       body: Container(
         padding: const EdgeInsets.all(12),
-        child: _vehicles.isEmpty
-            ? const Center(
-                child: Text(
-                  'No vehicles added yet.',
-                  style: TextStyle(fontSize: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Add New Vehicle button
+            ElevatedButton.icon(
+              onPressed:
+                  _addDummyVehicle, // (you can later replace this with a form)
+              icon: const Icon(Icons.add),
+              label: const Text('Add New Vehicle'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-              )
-            : ListView.builder(
-                itemCount: _vehicles.length,
-                itemBuilder: (context, index) {
-                  final v = _vehicles[index];
-                  return Card(
-                    elevation: 3,
-                    margin: const EdgeInsets.symmetric(vertical: 6),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: ListTile(
-                      leading: const Icon(
-                        Icons.directions_car,
-                        color: Colors.blue,
-                      ),
-                      title: Text('${v['make']} ${v['model']}'),
-                      subtitle: Text(
-                        'Year: ${v['year']} • Plate: ${v['license_plate']}',
-                      ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () async {
-                          await dbHelper.delete('vehicles', 'id = ?', [
-                            v['id'],
-                          ]);
-                          _loadVehicles();
-                        },
-                      ),
-                    ),
-                  );
-                },
               ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Vehicle list
+            Expanded(
+              child: _vehicles.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'No vehicles added yet.',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: _vehicles.length,
+                      itemBuilder: (context, index) {
+                        final v = _vehicles[index];
+                        return Card(
+                          elevation: 3,
+                          margin: const EdgeInsets.symmetric(vertical: 6),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.directions_car,
+                              color: Colors.blue,
+                            ),
+                            title: Text('${v['make']} ${v['model']}'),
+                            subtitle: Text(
+                              'Year: ${v['year']} • Plate: ${v['license_plate']}',
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () async {
+                                await dbHelper.delete('vehicles', 'id = ?', [
+                                  v['id'],
+                                ]);
+                                _loadVehicles();
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
