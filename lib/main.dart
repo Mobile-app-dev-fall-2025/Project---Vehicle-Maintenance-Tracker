@@ -35,6 +35,11 @@ class _VehicleListPageState extends State<VehicleListPage> {
   @override
   void initState() {
     super.initState();
+    _initializeDB();
+  }
+
+  Future<void> _initializeDB() async {
+    await dbHelper.seedMaintenanceTypes();
     _loadVehicles();
   }
 

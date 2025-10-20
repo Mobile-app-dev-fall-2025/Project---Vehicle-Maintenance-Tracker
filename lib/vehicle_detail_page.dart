@@ -1,3 +1,4 @@
+import 'package:act10/add_maintenace_page.dart';
 import 'package:flutter/material.dart';
 import './database/db_helper.dart';
 
@@ -108,14 +109,20 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          // TODO: navigate to add-maintenance page
-          // e.g. await Navigator.push(...);
-          // then reload logs
-          _loadMaintenanceLogs();
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddMaintenancePage(vehicleId: v['id']),
+            ),
+          );
+          if (result == true) {
+            _loadMaintenanceLogs(); // reload logs after adding
+          }
         },
-        child: const Icon(Icons.add),
+        icon: const Icon(Icons.add),
+        label: const Text('Add new maintenance log'),
       ),
     );
   }
