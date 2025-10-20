@@ -17,7 +17,7 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
   final modelController = TextEditingController();
   final yearController = TextEditingController();
   final licenseController = TextEditingController();
-  final mileageController = TextEditingController(); // ✅ NEW CONTROLLER
+  final mileageController = TextEditingController();
 
   Future<void> _saveVehicle() async {
     if (_formKey.currentState!.validate()) {
@@ -25,7 +25,7 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
         'make': makeController.text,
         'model': modelController.text,
         'year': int.tryParse(yearController.text) ?? 0,
-        'licensePlate': licenseController.text, // ✅ matches DB
+        'license_plate': licenseController.text,
         'mileage': int.tryParse(mileageController.text) ?? 0,
       });
 

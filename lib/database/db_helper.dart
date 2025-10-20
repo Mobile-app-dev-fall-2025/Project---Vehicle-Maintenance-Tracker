@@ -30,7 +30,7 @@ class DBHelper {
     make TEXT,
     model TEXT,
     year INTEGER,
-    licensePlate TEXT,
+    license_plate TEXT,
     mileage INTEGER
   )
 ''');
