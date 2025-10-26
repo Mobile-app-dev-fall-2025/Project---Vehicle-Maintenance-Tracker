@@ -1,6 +1,7 @@
 import 'package:act10/add_maintenace_page.dart';
 import 'package:flutter/material.dart';
 import './database/db_helper.dart';
+import 'package:intl/intl.dart'; // for date formatting
 
 class VehicleDetailPage extends StatefulWidget {
   final Map<String, dynamic> vehicle;
@@ -22,14 +23,36 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
   }
 
   Future<void> _loadMaintenanceLogs() async {
-    final data = await dbHelper.queryWhere(
-      'maintenance_logs',
-      'vehicle_id = ?',
+    final db = await dbHelper.database;
+    // Join with maintenance_types to get name + interval
+    final data = await db.rawQuery(
+      '''
+      SELECT maintenance_logs.*, 
+             maintenance_types.name AS type,
+             maintenance_types.recommended_interval_days AS interval_days
+      FROM maintenance_logs
+      LEFT JOIN maintenance_types 
+        ON maintenance_logs.maintenance_type_id = maintenance_types.id
+      WHERE maintenance_logs.vehicle_id = ?
+      ORDER BY maintenance_logs.date_performed DESC
+    ''',
       [widget.vehicle['id']],
     );
+
     setState(() {
       _logs = data;
     });
+  }
+
+  String _calculateNextDate(String? lastDate, int? intervalDays) {
+    if (lastDate == null || intervalDays == null) return 'Unknown';
+    try {
+      final parsedDate = DateTime.parse(lastDate);
+      final nextDate = parsedDate.add(Duration(days: intervalDays));
+      return DateFormat('yyyy-MM-dd').format(nextDate);
+    } catch (_) {
+      return 'Unknown';
+    }
   }
 
   @override
@@ -94,13 +117,24 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
                   )
                 : Column(
                     children: _logs.map((log) {
+                      final nextRecommendedDate = _calculateNextDate(
+                        log['date_performed'] as String?,
+                        log['interval_days'] is int
+                            ? log['interval_days'] as int
+                            : int.tryParse(
+                                log['interval_days']?.toString() ?? '',
+                              ),
+                      );
+
                       return Card(
                         elevation: 2,
                         margin: const EdgeInsets.symmetric(vertical: 6),
                         child: ListTile(
-                          title: Text(log['type']),
+                          title: Text(log['type'] ?? 'Unknown Type'),
                           subtitle: Text(
-                            'Date: ${log['date']}  |  Mileage: ${log['mileage']} mi\nNotes: ${log['notes'] ?? ''}',
+                            'Date: ${log['date_performed'] ?? 'Unknown'}  |  Mileage: ${log['mileage'] ?? 'N/A'} mi\n'
+                            'Notes: ${log['notes'] ?? ''}\n'
+                            'Next recommended ${log['type'] ?? 'maintenance'} date: $nextRecommendedDate',
                           ),
                         ),
                       );

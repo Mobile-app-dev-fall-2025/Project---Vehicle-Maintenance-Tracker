@@ -40,17 +40,53 @@ class _AddMaintenancePageState extends State<AddMaintenancePage> {
 
   Future<void> _saveLog() async {
     if (_formKey.currentState!.validate() && _selectedTypeId != null) {
-      await dbHelper.insert('maintenance_logs', {
+      final logData = {
         'vehicle_id': widget.vehicleId,
         'maintenance_type_id': _selectedTypeId,
         'date_performed': dateController.text,
         'mileage': int.tryParse(mileageController.text) ?? 0,
         'notes': notesController.text,
-      });
+      };
 
+      await dbHelper.insert('maintenance_logs', logData);
       if (mounted) Navigator.pop(context, true);
     }
   }
+
+  // Future<void> _saveLog() async {
+  //   if (_formKey.currentState!.validate() && _selectedTypeId != null) {
+  //     // Prepare the log data
+  //     final logData = {
+  //       'vehicle_id': widget.vehicleId,
+  //       'maintenance_type_id': _selectedTypeId,
+  //       'date_performed': dateController.text,
+  //       'mileage': int.tryParse(mileageController.text) ?? 0,
+  //       'notes': notesController.text,
+  //     };
+
+  //     // Create a string showing values and their types
+  //     final displayText = logData.entries
+  //         .map((e) => '${e.key}: ${e.value} (${e.value.runtimeType})')
+  //         .join('\n');
+
+  //     // Show the popup dialog
+  //     if (mounted) {
+  //       showDialog(
+  //         context: context,
+  //         builder: (context) => AlertDialog(
+  //           title: const Text('Log Data Preview'),
+  //           content: Text(displayText),
+  //           actions: [
+  //             TextButton(
+  //               onPressed: () => Navigator.pop(context),
+  //               child: const Text('OK'),
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     }
+  //   }
+  // }
 
   @override
   void dispose() {
@@ -74,7 +110,7 @@ class _AddMaintenancePageState extends State<AddMaintenancePage> {
                   children: [
                     // Maintenance Type Dropdown
                     DropdownButtonFormField<int>(
-                      value: _selectedTypeId,
+                      initialValue: _selectedTypeId,
                       items: _maintenanceTypes
                           .map(
                             (type) => DropdownMenuItem<int>(
